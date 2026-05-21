@@ -1,0 +1,8 @@
+{
+  "name": "Svadobná Fotogaléria",
+  "description": "Zdieľajte svoje svadobné momenty priamo na náš Google Disk. Nahrajte fotky s vašou prezývkou a prezerajte si spoločné spomienky.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

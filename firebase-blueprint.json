@@ -1,0 +1,36 @@
+{
+  "entities": {
+    "Photo": {
+      "title": "Photo",
+      "description": "Metadata for a photo stored in Google Drive",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Google Drive File ID" },
+        "thumbnailLink": { "type": "string", "description": "Drive thumbnail link" },
+        "webContentLink": { "type": "string", "description": "Drive download link" },
+        "nickname": { "type": "string", "description": "Uploader's nickname" },
+        "dateTaken": { "type": "string", "format": "date-time", "description": "When the photo was taken (EXIF or upload time)" },
+        "createdTime": { "type": "string", "format": "date-time", "description": "Drive creation time" }
+      },
+      "required": ["id", "thumbnailLink", "nickname", "dateTaken"]
+    },
+    "Config": {
+      "title": "Global Config",
+      "description": "Global wedding configuration",
+      "type": "object",
+      "properties": {
+        "folderId": { "type": "string", "description": "The shared Google Drive folder ID" }
+      }
+    }
+  },
+  "firestore": {
+    "/photos/{photoId}": {
+      "schema": "Photo",
+      "description": "Collection of all uploaded photos"
+    },
+    "/config/wedding": {
+      "schema": "Config",
+      "description": "Global settings like the shared Drive folder ID"
+    }
+  }
+}

@@ -1,0 +1,60 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // --- Helpers ---
+    function isValidId(id) { 
+      return id is string && id.size() <= 256; 
+    }
+    
+    function isSignedIn() { 
+      return request.auth != null; 
+    }
+
+    function isValidPhoto(data) {
+      return data.keys().hasAll(['id', 'nickname', 'dateTaken']) &&
+             data.id is string &&
+             data.nickname is string && data.nickname.size() >= 1 &&
+             data.dateTaken is string;
+    }
+
+    function isValidConfig(data) {
+      return data.keys().hasAll(['folderId']);
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'majo.reiter@gmail.com' && request.auth.token.email_verified == true
+      );
+    }
+
+    // --- Collections ---
+    match /photos/{photoId} {
+      allow read: if true;
+      allow create: if isValidPhoto(request.resource.data);
+      allow update: if isAdmin() || (
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes']) ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['commentCount']) ||
+        isValidPhoto(request.resource.data)
+      );
+      allow delete: if isAdmin() || (isSignedIn() && request.auth.uid == (resource != null ? resource.data.uid : ""));
+
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if request.resource.data.nickname is string && request.resource.data.text is string;
+        allow delete: if isAdmin() || (isSignedIn() && request.auth.uid == (resource != null ? resource.data.uid : ""));
+      }
+    }
+
+    match /config/{configId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Default-deny catch-all (at the end)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
